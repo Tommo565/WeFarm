@@ -8,6 +8,8 @@ import warnings
 import csv
 from datetime import datetime as dt
 from sklearn.externals import joblib
+import operator
+import random
 
 from gensim import corpora, models
 from nltk.corpus import stopwords
@@ -159,10 +161,10 @@ def top_users_for_topic(topics_to_users, t, max_val=50):
 def topic_scores_for_message(message, word_dict, model):
     message_to_predict = messages_vectorizer([message])
     message_to_predict = word_dict.doc2bow(message_to_predict)
-    scores = the_model.get_document_topics(message_to_predict)
+    scores = model.get_document_topics(message_to_predict)
     return scores
 
-def top_users_for_message(message, user_scores):
+def top_users_for_message(message, user_scores, word_dict, model):
     message_scores = topic_scores_for_message(message, word_dict, model)
     topic = max(message_scores, key=lambda item:item[1])[0]
     top_users = [x for (x, y) in top_users_for_topic(user_scores, topic)]
@@ -267,14 +269,15 @@ def main():
             grouped_user_ids.append(k)
 
     # build the topic model and save it
-    print("Building the model")
-    users_topic_model = model(grouped_user_data, state, num_topics)
-    the_model = users_topic_model[0]
-    the_corpus = users_topic_model[1]
-    word_dict = users_topic_model[2]
-    joblib.dump(users_topic_model, '../Outputs/users_topic_model.pkl' ) 
+    # print("Building the model")
+    # users_topic_model = model(grouped_user_data, state, num_topics)
+    # the_model = users_topic_model[0]
+    # the_corpus = users_topic_model[1]
+    # word_dict = users_topic_model[2]
+    # joblib.dump(users_topic_model, '../Outputs/users_topic_model.pkl' ) 
 
-    # load the model that have just been built
+    # load the model that has just been built
+    print("loading the model")
     users_topic_model = joblib.load('../Outputs/users_topic_model.pkl')
     the_model = users_topic_model[0]
     the_corpus = users_topic_model[1]
